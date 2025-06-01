@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learning And Human Behavior</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #3498db 0%, #6dd5fa 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        width: 420px;
+        background: #ffffff;
+        padding: 30px 25px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      #question-text {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: #333;
+        padding: 14px 20px;
+        background-color: #e3f2fd;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+        display: inline-block;
+        max-width: 100%;
+        line-height: 1.4;
+        user-select: none;
+      }
+      .btn-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 15px;
+      }
+      button {
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        background-color: #3498db;
+        color: white;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+      }
+      button:hover {
+        background-color: #2980b9;
+        transform: scale(1.02);
+      }
+      button:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+      }
+      .correct {
+        background-color: #2ecc71 !important;
+      }
+      .wrong {
+        background-color: #e74c3c !important;
+      }
+      .answer-btn:last-of-type {
+        margin-bottom: 10px;
+      }
+      #question-number {
+        margin-bottom: 15px;
+        font-size: 16px;
+        color: #666;
+        font-weight: 500;
+      }
+      #result-box {
+        margin-top: 20px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #2c3e50;
+        padding: 12px;
+        background-color: #dfefff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+      .hide {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 id="quiz-title">Learning And Human Behavior</h2>
+
+      <div id="start-box">
+        <button id="start-btn">Start</button>
+      </div>
+      <div id="quiz-box" class="hide">
+        <div id="question-number"></div>
+        <div id="question-text"></div>
+        <div id="answer-buttons" class="btn-grid"></div>
+        <button id="next-btn" disabled>Next</button>
+      </div>
+      <div id="result-box" class="hide">
+        <h3>Your Score</h3>
+        <p id="score-text"></p>
+        <button id="try-again-btn">Try Again</button>
+      </div>
+    </div>
+    <script>
+      const allQuestions = [
+        {
+          question:
+            "What is the definition of learning?",
+          options: [
+            "A change in knowledge as a result of study.",
+            "A change in behavior as a result of experience.",
+            "A change in emotions as a result of social interaction.",
+            "A change in memory as a result of repetition.",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Which of the following is NOT an approach to learning?",
+          options: [
+            "Behavioral approach",
+            "Cognitive approach",
+            "Emotional approach",
+            "Associative approach",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Classical conditioning was proposed by:",
+          options: ["Skinner", "Pavlov", "Freud", "Bandura"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "In classical conditioning, the unconditioned stimulus (US) leads to:",
+          options: [
+            "Conditioned response (CR)",
+            "Unconditioned response (UR)",
+            "Conditioned stimulus (CS)",
+            "Neutral stimulus",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Operant conditioning focuses on:",
+          options: [
+            "Involuntary responses",
+            "Rewards and punishments",
+            "Stimulus-driven behavior",
+            "Passive learning",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Which of the following is an example of positive reinforcement?",
+          options: [
+            "Giving a bonus for good work",
+            "Taking away a toy for misbehavior",
+            "Ignoring a child's scream",
+            "Making a child stand in a corner",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question: "Negative reinforcement involves:",
+          options: [
+            "Cessation a behavior by ignoring it",
+            "Strengthening a behavior by receiving a positive condition",
+            "Strengthening a behavior by stopping a negative condition",
+            "Weakening a behavior by adding a negative condition",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Punishment in operant conditioning aims to:",
+          options: [
+            "Increase a behavior",
+            "Decrease a behavior",
+            "Ignore a behavior",
+            "Reward a behavior",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Extinction occurs when:",
+          options: [
+            "A behavior is rewarded",
+            "A behavior is punished",
+            "A behavior is ignored",
+            "A behavior is repeated",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Flooding is a technique used to treat:",
+          options: ["Phobias", "Depression", "Drug abuse", "Sleep disorders"],
+          correctIndex: 0,
+        },
+        {
+          question: "Systematic desensitization involves:",
+          options: [
+            "Immediate exposure to fear",
+            "Gradual exposure to fear",
+            "Ignoring fear",
+            "Pairing unwanted behavior with a unpleasant stimulus",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Aversion therapy pairs an unwanted behavior with:",
+          options: [
+            "A pleasant stimulus",
+            "An unpleasant stimulus",
+            "A neutral stimulus",
+            "No stimulus",
+          ],
+          correctIndex: 1,
+        },
+        // !!!!!!!!!!!!!!!!!!!!!!!!
+        {
+          question: "Which of the following is a method of learning?",
+          options: ["Imitation", "Sleep", "Eating", "Talking"],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "Which of the following is true about classical conditioning?",
+          options: [
+            "The animal is active",
+            "Responses are voluntary",
+            "Stimulus determines the behavior",
+            "It creates novel behavior",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Positive reinforcement and negative reinforcement both:",
+          options: [
+            "Decrease behavior",
+            "Increase behavior",
+            "Ignore behavior",
+            "Punish behavior",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Insight learning involves:",
+          options: [
+            "Trial and error without planning",
+            "Trial and error with mental planning",
+            "Rewards and punishments",
+            "Behavioral responses to stimuli",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Which of the following is NOT an element of operant conditioning?",
+          options: [
+            "Stimulus situation",
+            "Behavioral response",
+            "Unconditioned stimulus",
+            "Consequences of a response",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Classical conditioning is most effective for:",
+          options: [
+            "Voluntary behaviors",
+            "Involuntary behaviors",
+            "Novel behaviors",
+            "Complex behaviors",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "A baby learning that the sight of a breast will be followed by milk is an example of:",
+          options: [
+            "Operant conditioning",
+            "Classical conditioning",
+            "Observational learning",
+            "Insight learning",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Which technique involves forcing someone to confront their fear intensely and rapidly?",
+          options: [
+            "Systematic desensitization",
+            "Flooding",
+            "Aversion therapy",
+            "Extinction",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "The goal of flooding is for the client to realize that:",
+          options: [
+            "Their fear is justified",
+            "Nothing bad happened",
+            "They need more therapy",
+            "They should avoid the fear",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Systematic desensitization begins with:",
+          options: [
+            "Direct exposure to the fear",
+            "Relaxation techniques",
+            "Experiencing a negative condition",
+            "Ignoring the fear",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Aversion therapy is often used to treat:",
+          options: [
+            "Phobias",
+            "Substance abuse",
+            "Sleep disorders",
+            "Depression",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Which of the following is an example of operant conditioning?",
+          options: [
+            "Salivating at the sight of food",
+            "Pressing a lever to get food",
+            "Blinking when a light is flashed",
+            "Jumping at a loud noise",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "In operant conditioning, the animal is:",
+          options: ["Passive", "Active", "Unconscious", "Ignored"],
+          correctIndex: 1,
+        },
+        {
+          question: "Classical conditioning does NOT:",
+          options: [
+            "Create novel behavior",
+            "Involve involuntary responses",
+            "Depend on stimuli",
+            "Involve passive animal",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "Which of the following is a key difference between classical and operant conditioning?",
+          options: [
+            "Classical conditioning involves rewards, while operant does not",
+            "Operant conditioning involves involuntary responses, while classical does not",
+            "Classical conditioning is stimulus-driven, while operant is behavior-driven",
+            "Operant conditioning is passive, while classical is active",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Positive reinforcement involves:",
+          options: [
+            "Adding a pleasant stimulus",
+            "Removing an unpleasant stimulus",
+            "Adding an unpleasant stimulus",
+            "Removing a pleasant stimulus",
+          ],
+          correctIndex: 0,
+        },
+        {
+          question: "Which of the following involves staying calm while focusing on fears?",
+          options: [
+            "Operant conditioning",
+            "Classical conditioning",
+            "Imitation",
+            "Insight learning",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Which of the following best defines classical conditioning?",
+          options: [
+            "A learning process where behavior is modified by rewards or punishments",
+            "A sudden understanding or solution to a problem without trial-and-error",
+            "Learning by observing and imitating others' behavior",
+            "behavior is learnt by repetitive association between the response and the stimulus",
+          ],
+          correctIndex: 3,
+        },
+        {
+          question: "When an organism learns that one event follows another, this is known as:",
+          options: [
+            "Aversion Therapy",
+            "Systematic Desensitization",
+            "Flooding",
+            "Extinction",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "What is the definition of extinction in operant conditioning?",
+          options: [
+            "Strengthening a behavior by rewarding it consistently.",
+            "Weakening a behavior by introducing punishment.",
+            "Stopping a behavior by removing its reinforcement or reward.",
+            "Replacing an old behavior with a new one through imitation.",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Negative reinforcement involves:",
+          options: [
+            "Adding a pleasant stimulus",
+            "Removing an unpleasant stimulus",
+            "Adding an unpleasant stimulus",
+            "Removing a pleasant stimulus",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Punishment is intended to:",
+          options: [
+            "Strengthen behavior",
+            "Weaken behavior",
+            "Ignore behavior",
+            "Reward behavior",
+          ],
+          correctIndex: 1,
+        },
+        {
+          question: "Extinction is achieved by:",
+          options: [
+            "Rewarding behavior",
+            "Punishing behavior",
+            "Ignoring behavior",
+            "Repeating behavior",
+          ],
+          correctIndex: 2,
+        },
+        {
+          question: "Which of the following is an example of insight learning?",
+          options: [
+            "A child imitating a parent",
+            "A rat pressing a lever for food",
+            "A dog salivating at a bell",
+            "A chimpanzee solving a puzzle after mental planning",
+          ],
+          correctIndex: 3,
+        },
+
+        // True/False as multiple choice
+        {
+          question:
+            "Learning is defined as a change in behavior as a result of experience.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "The cognitive approach to learning is based on associations between events.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question: "Classical conditioning involves voluntary responses.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question: "Operant conditioning was proposed by Ivan Pavlov.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "In classical conditioning, the unconditioned stimulus (US) naturally elicits a response.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question: "Positive reinforcement weakens behavior.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Negative reinforcement involves removing an unpleasant stimulus to strengthen behavior.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "Punishment is used to increase the possibility possibility of a behavior.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Extinction occurs when a behavior is consistently rewarded.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question: "Flooding involves gradual exposure to a feared object.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Systematic desensitization begins with relaxation techniques.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question:
+            "Aversion therapy pairs an unwanted behavior with a pleasant stimulus.",
+          options: ["True", "False"],
+          correctIndex: 1,
+        },
+        {
+          question:
+            "Insight learning involves trial and error with mental planning.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+        {
+          question: "Operant conditioning is used to create novel behaviors.",
+          options: ["True", "False"],
+          correctIndex: 0,
+        },
+      ];
+
+      let currentQuestionIndex = 0;
+      let score = 0;
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+      shuffleArray(allQuestions);
+
+      const startBtn = document.getElementById("start-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const tryAgainBtn = document.getElementById("try-again-btn");
+      const quizBox = document.getElementById("quiz-box");
+      const startBox = document.getElementById("start-box");
+      const questionNumberElement = document.getElementById("question-number");
+      const questionText = document.getElementById("question-text");
+      const answerButtons = document.getElementById("answer-buttons");
+      const resultBox = document.getElementById("result-box");
+      const scoreText = document.getElementById("score-text");
+
+      startBtn.addEventListener("click", startQuiz);
+      nextBtn.addEventListener("click", () => {
+        currentQuestionIndex++;
+        setNextQuestion();
+      });
+      tryAgainBtn.addEventListener("click", startQuiz);
+
+      function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        startBox.classList.add("hide");
+        resultBox.classList.add("hide");
+        quizBox.classList.remove("hide");
+        setNextQuestion();
+      }
+
+      function setNextQuestion() {
+        resetState();
+        if (currentQuestionIndex < allQuestions.length) {
+          showQuestion(allQuestions[currentQuestionIndex]);
+        } else {
+          showResult();
+        }
+      }
+
+      function showQuestion(questionObj) {
+        questionNumberElement.textContent = `Question ${
+          currentQuestionIndex + 1
+        } of ${allQuestions.length}`;
+        questionText.textContent = questionObj.question;
+
+        questionObj.options.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.textContent = option;
+          button.classList.add("answer-btn");
+          button.addEventListener("click", () =>
+            selectAnswer(button, index === questionObj.correctIndex)
+          );
+          answerButtons.appendChild(button);
+        });
+      }
+
+      function resetState() {
+        nextBtn.disabled = true;
+        answerButtons.innerHTML = "";
+      }
+
+      function selectAnswer(button, isCorrect) {
+        const buttons = answerButtons.querySelectorAll("button");
+        buttons.forEach((btn) => {
+          btn.disabled = true;
+        });
+
+        if (isCorrect) {
+          button.classList.add("correct");
+          score++;
+        } else {
+          button.classList.add("wrong");
+          const correctButton =
+            buttons[allQuestions[currentQuestionIndex].correctIndex];
+          correctButton.classList.add("correct");
+        }
+
+        nextBtn.disabled = false;
+      }
+
+      function showResult() {
+        quizBox.classList.add("hide");
+        resultBox.classList.remove("hide");
+        scoreText.textContent = `${score} out of ${allQuestions.length} correct`;
+      }
+    </script>
+  </body>
+</html>
